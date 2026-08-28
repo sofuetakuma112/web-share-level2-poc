@@ -20,7 +20,8 @@ body {
 }
 
 button,
-input {
+input,
+textarea {
   font: inherit;
 }
 
@@ -165,6 +166,49 @@ h2 {
 .text-link {
   color: #4338ca;
   font-weight: 700;
+}
+
+.share-fields {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.form-field {
+  display: grid;
+  gap: 8px;
+  color: #172033;
+  font-weight: 700;
+}
+
+.form-field small,
+.file-picker small {
+  color: #69758b;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.form-field input,
+.form-field textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #172033;
+  font-weight: 400;
+}
+
+.form-field textarea {
+  min-height: 112px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
+  border-color: #6366f1;
+  outline: 3px solid rgb(79 70 229 / 20%);
 }
 
 .file-picker {
@@ -361,6 +405,17 @@ h2 {
   .file-picker input,
   .details pre {
     color: #aebbd0;
+  }
+
+  .form-field {
+    color: #eef2ff;
+  }
+
+  .form-field input,
+  .form-field textarea {
+    border-color: #475569;
+    background: #1d2740;
+    color: #eef2ff;
   }
 
   .card {

@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="light dark" />
     <meta
       name="description"
-      content="Web Share APIを使ったファイル共有の対応状況と動作を確認するPoC"
+      content="Web Share APIを使ったファイルとテキストの共有を確認するPoC"
     />
     <title>Web Share Level 2 PoC</title>
     <link rel="stylesheet" href="./style.css" />
@@ -16,9 +16,9 @@
     <main class="container">
       <header class="hero">
         <p class="eyebrow">WEB SHARE API</p>
-        <h1>ファイル共有 PoC</h1>
+        <h1>ファイル・テキスト共有 PoC</h1>
         <p class="lead">
-          選択したファイルを<code>navigator.share({ files })</code>でOSの共有先へ渡します。
+          入力したタイトル、本文、ファイルを<code>navigator.share()</code>でOSの共有先へ渡します。
         </p>
       </header>
 
@@ -54,23 +54,44 @@
         </aside>
       </section>
 
-      <section class="card" aria-labelledby="file-heading">
+      <section class="card" aria-labelledby="content-heading">
         <div class="section-heading section-heading-responsive">
           <div>
             <p class="step">STEP 2</p>
-            <h2 id="file-heading">共有するファイルを選択</h2>
+            <h2 id="content-heading">共有する内容を指定</h2>
           </div>
           <button id="sample-button" class="button button-secondary" type="button">
             サンプル画像を作成
           </button>
         </div>
 
+        <div class="share-fields">
+          <label class="form-field" for="title-input">
+            <span>タイトル <small>任意</small></span>
+            <input
+              id="title-input"
+              type="text"
+              placeholder="例: Web Share API PoC"
+              autocomplete="off"
+            />
+          </label>
+
+          <label class="form-field" for="text-input">
+            <span>本文 <small>任意</small></span>
+            <textarea
+              id="text-input"
+              rows="4"
+              placeholder="共有したいテキストを入力してください。"
+            ></textarea>
+          </label>
+        </div>
+
         <label class="file-picker" for="file-input">
-          <span>ファイルを選択</span>
+          <span>ファイルを選択 <small>任意</small></span>
           <input id="file-input" type="file" multiple />
         </label>
         <p class="hint">
-          共有可能なファイル形式はブラウザとOSによって異なります。最初はサンプル画像で確認できます。
+          テキストだけでも共有できます。共有可能なファイル形式はブラウザとOSによって異なるため、最初はサンプル画像で確認できます。
         </p>
 
         <div id="file-summary" class="file-summary" aria-live="polite">
@@ -79,10 +100,10 @@
 
         <div class="share-area">
           <button id="share-button" class="button button-primary" type="button" disabled>
-            ファイルを共有
+            共有する
           </button>
           <output id="result" class="result" aria-live="polite">
-            ファイルを選択すると共有可否を判定します。
+            タイトル、本文、またはファイルを指定すると共有可否を判定します。
           </output>
         </div>
       </section>

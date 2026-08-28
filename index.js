@@ -3,6 +3,8 @@ const shareApiOutput = document.querySelector('#share-api');
 const canShareApiOutput = document.querySelector('#can-share-api');
 const iframeNotice = document.querySelector('#iframe-notice');
 const openDirectlyLink = document.querySelector('#open-directly');
+const titleInput = document.querySelector('#title-input');
+const textInput = document.querySelector('#text-input');
 const fileInput = document.querySelector('#file-input');
 const sampleButton = document.querySelector('#sample-button');
 const fileSummary = document.querySelector('#file-summary');
@@ -34,7 +36,25 @@ function formatBytes(bytes) {
   return `${value.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
 }
 
-function getFileShareSupport() {
+function getShareData() {
+  const shareData = {};
+
+  if (titleInput.value.trim().length > 0) {
+    shareData.title = titleInput.value;
+  }
+
+  if (textInput.value.trim().length > 0) {
+    shareData.text = textInput.value;
+  }
+
+  if (selectedFiles.length > 0) {
+    shareData.files = selectedFiles;
+  }
+
+  return shareData;
+}
+
+function getShareSupport(shareData) {
   if (!window.isSecureContext) {
     return {
       supported: false,
@@ -49,26 +69,34 @@ function getFileShareSupport() {
     };
   }
 
-  if (typeof navigator.canShare !== 'function') {
+  if (Object.keys(shareData).length === 0) {
+    return {
+      supported: false,
+      message: 'タイトル、本文、またはファイルを指定すると共有可否を判定します。',
+    };
+  }
+
+  const includesFiles = 'files' in shareData;
+  if (includesFiles && typeof navigator.canShare !== 'function') {
     return {
       supported: false,
       message: 'このブラウザはファイル共有可否を判定できません。',
     };
   }
 
-  if (selectedFiles.length === 0) {
+  if (typeof navigator.canShare !== 'function') {
     return {
-      supported: false,
-      message: 'ファイルを選択すると共有可否を判定します。',
+      supported: true,
+      message: 'navigator.shareが利用できます。共有時にブラウザが内容を確認します。',
     };
   }
 
   try {
-    // Level 2の判定対象であるfilesだけを渡し、ほかの共有データの影響を受けないようにする。
-    if (navigator.canShare({ files: selectedFiles })) {
+    // 実際にshare()へ渡すタイトル、本文、ファイルの組み合わせをまとめて判定する。
+    if (navigator.canShare(shareData)) {
       return {
         supported: true,
-        message: 'navigator.canShare({ files })がtrueを返しました。',
+        message: 'navigator.canShare(共有データ)がtrueを返しました。',
       };
     }
 
@@ -76,7 +104,7 @@ function getFileShareSupport() {
       supported: false,
       message: isEmbedded()
         ? 'iframeのPermissions Policyで共有が許可されていない可能性があります。別タブで開いてください。'
-        : 'navigator.canShare({ files })がfalseを返しました。ブラウザ、OS、ファイル形式のいずれかが未対応です。',
+        : 'navigator.canShare(共有データ)がfalseを返しました。ブラウザ、OS、または指定した内容の組み合わせが未対応です。',
     };
   } catch (error) {
     return {
@@ -107,7 +135,7 @@ function renderEnvironment() {
   ].join('\n');
 }
 
-function renderFiles() {
+function renderShareState() {
   fileSummary.replaceChildren();
 
   if (selectedFiles.length === 0) {
@@ -130,7 +158,7 @@ function renderFiles() {
     fileSummary.append(list);
   }
 
-  const support = getFileShareSupport();
+  const support = getShareSupport(getShareData());
   shareButton.disabled = !support.supported;
   resultOutput.textContent = support.message;
   resultOutput.className = support.supported ? 'result result-success' : 'result';
@@ -186,8 +214,11 @@ async function createSampleImage() {
 
 fileInput.addEventListener('change', () => {
   selectedFiles = Array.from(fileInput.files ?? []);
-  renderFiles();
+  renderShareState();
 });
+
+titleInput.addEventListener('input', renderShareState);
+textInput.addEventListener('input', renderShareState);
 
 sampleButton.addEventListener('click', async () => {
   sampleButton.disabled = true;
@@ -195,7 +226,7 @@ sampleButton.addEventListener('click', async () => {
   try {
     selectedFiles = [await createSampleImage()];
     fileInput.value = '';
-    renderFiles();
+    renderShareState();
   } catch (error) {
     resultOutput.textContent = error instanceof Error ? error.message : '画像を作成できませんでした。';
     resultOutput.className = 'result result-error';
@@ -205,9 +236,10 @@ sampleButton.addEventListener('click', async () => {
 });
 
 shareButton.addEventListener('click', async () => {
-  const support = getFileShareSupport();
+  const shareData = getShareData();
+  const support = getShareSupport(shareData);
   if (!support.supported) {
-    renderFiles();
+    renderShareState();
     return;
   }
 
@@ -215,8 +247,8 @@ shareButton.addEventListener('click', async () => {
   resultOutput.className = 'result';
 
   try {
-    // ユーザー操作の中でshare()を呼び出し、選択済みのファイルだけを共有する。
-    await navigator.share({ files: selectedFiles });
+    // ユーザー操作の中でshare()を呼び出し、入力された共有データをまとめて渡す。
+    await navigator.share(shareData);
     resultOutput.textContent = '共有処理が完了しました。';
     resultOutput.className = 'result result-success';
   } catch (error) {
@@ -226,4 +258,4 @@ shareButton.addEventListener('click', async () => {
 });
 
 renderEnvironment();
-renderFiles();
+renderShareState();
