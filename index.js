@@ -5,6 +5,7 @@ const iframeNotice = document.querySelector('#iframe-notice');
 const openDirectlyLink = document.querySelector('#open-directly');
 const titleInput = document.querySelector('#title-input');
 const textInput = document.querySelector('#text-input');
+const urlInput = document.querySelector('#url-input');
 const fileInput = document.querySelector('#file-input');
 const sampleButton = document.querySelector('#sample-button');
 const fileSummary = document.querySelector('#file-summary');
@@ -47,6 +48,10 @@ function getShareData() {
     shareData.text = textInput.value;
   }
 
+  if (urlInput.value.trim().length > 0) {
+    shareData.url = urlInput.value.trim();
+  }
+
   if (selectedFiles.length > 0) {
     shareData.files = selectedFiles;
   }
@@ -72,7 +77,14 @@ function getShareSupport(shareData) {
   if (Object.keys(shareData).length === 0) {
     return {
       supported: false,
-      message: 'タイトル、本文、またはファイルを指定すると共有可否を判定します。',
+      message: 'タイトル、本文、URL、またはファイルを指定すると共有可否を判定します。',
+    };
+  }
+
+  if ('url' in shareData && !urlInput.validity.valid) {
+    return {
+      supported: false,
+      message: 'URLを「https://example.com/」のような形式で入力してください。',
     };
   }
 
@@ -92,7 +104,7 @@ function getShareSupport(shareData) {
   }
 
   try {
-    // 実際にshare()へ渡すタイトル、本文、ファイルの組み合わせをまとめて判定する。
+    // 実際にshare()へ渡すタイトル、本文、URL、ファイルの組み合わせをまとめて判定する。
     if (navigator.canShare(shareData)) {
       return {
         supported: true,
@@ -219,6 +231,7 @@ fileInput.addEventListener('change', () => {
 
 titleInput.addEventListener('input', renderShareState);
 textInput.addEventListener('input', renderShareState);
+urlInput.addEventListener('input', renderShareState);
 
 sampleButton.addEventListener('click', async () => {
   sampleButton.disabled = true;

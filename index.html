@@ -6,11 +6,11 @@
     <meta name="color-scheme" content="light dark" />
     <meta
       name="description"
-      content="Web Share APIを使ったファイルとテキストの共有を確認するPoC"
+      content="Web Share APIを使ったファイル、テキスト、URLの共有を確認するPoC"
     />
     <title>Web Share Level 2 PoC</title>
     <link rel="stylesheet" href="./style.css?v=2" />
-    <script type="module" src="./index.js?v=2"></script>
+    <script type="module" src="./index.js?v=3"></script>
   </head>
   <body>
     <main class="container">
@@ -18,7 +18,7 @@
         <p class="eyebrow">WEB SHARE API</p>
         <h1>ファイル・テキスト共有 PoC</h1>
         <p class="lead">
-          入力したタイトル、本文、ファイルを<code>navigator.share()</code>でOSの共有先へ渡します。
+          入力したタイトル、本文、URL、ファイルを<code>navigator.share()</code>でOSの共有先へ渡します。
         </p>
       </header>
 
@@ -84,6 +84,17 @@
               placeholder="共有したいテキストを入力してください。"
             ></textarea>
           </label>
+
+          <label class="form-field" for="url-input">
+            <span>URL <small>任意</small></span>
+            <input
+              id="url-input"
+              type="url"
+              inputmode="url"
+              placeholder="https://example.com/"
+              autocomplete="url"
+            />
+          </label>
         </div>
 
         <label class="file-picker" for="file-input">
@@ -103,7 +114,7 @@
             共有する
           </button>
           <output id="result" class="result" aria-live="polite">
-            タイトル、本文、またはファイルを指定すると共有可否を判定します。
+            タイトル、本文、URL、またはファイルを指定すると共有可否を判定します。
           </output>
         </div>
       </section>
